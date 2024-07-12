@@ -89,7 +89,13 @@ Please refer to the following repos:
 
 https://github.com/cloudd-11/douban_crawler
 
+https://huggingface.co/datasets/cloudd-11/douban_crawler
+
 因为github仓库容量有限制，所以数据库文件`movies.db`, `movieonly.db`, 停用词表`stopwords.txt`, 封面图库`images/`, 词云图库`wordclouds/`都托管在huggingface。
+
+![alt text](ref/image.png)
+
+<div style="page-break-after:always;"></div> 
 
 ## 1.爬虫
 
@@ -746,5 +752,110 @@ def update_database(db_path):
 
 ## 4.前端界面
 
-使用Next.js编写了一个展示电影信息的网站。
+使用Next.js编写了一个展示电影信息的网站。具体界面样式可参考源码，以下只介绍排序算法和访问数据库的逻辑。
 
+### 排序算法
+
+如果完全按照评分排序，那么一些小众的、打分人数少但评分极高的电影会排在前面，这与实际想要体现的效果是违背的。因此在应该将评分与评分人数两个信息结合，构造新的加权分数。
+
+首先计算得到所有电影的平均评分`C`，接着将其与真实评分`R`进行加权，权重因子中，`v`是真实评分人数，`m`是评分人数的阈值，将其设为100000时具有最好的效果。
+
+$$\text{weighted\_rating} = \left( \frac{v}{v + m} \right) \times R + \left( \frac{m}{v + m} \right) \times C$$
+
+### 按类型查询并排序
+
+`searchMoviesByType.js`负责推荐页面的按类型查询并排序功能。
+
+#### 异步打开数据库
+
+```javascript
+async function openDB() {
+  return open({
+    filename: join(process.cwd(), 'db', 'movieonly.db'),
+    driver: sqlite3.Database
+  });
+}
+```
+
+- 使用 async/await 语法来异步地打开数据库。
+- join 函数用于将当前工作目录（process.cwd()）和指定的路径片段合并成一个完整的文件路径。
+- open 函数用于打开SQLite数据库，并返回一个数据库对象。
+
+#### 安全解析JSON
+
+```javascript
+function safeJSONParse(value) {
+  try {
+    return value ? JSON.parse(value) : [];
+  } catch (error) {
+    console.error('JSON.parse failed:', error);
+    return [];
+  }
+}
+```
+
+- 安全地解析可能包含无效JSON的值。
+- 如果解析失败，返回一个空数组，并记录错误信息。
+
+#### 查询与排序
+
+```javascript
+const rows = await db.all('SELECT * FROM movies');
+
+const C = processedMovies.reduce((acc, movie) => acc + parseFloat(movie.score), 0) / processedMovies.length;
+
+const calculateWeightedRating = (movie) => {
+  const R = parseFloat(movie.score);
+  const v = movie.vote_count; // 使用 vote_count 表示评分人数
+  return (v / (v + m)) * R + (m / (v + m)) * C;
+};
+```
+
+- 使用 await 关键字等待数据库异步查询完成。
+- 这里执行的是一个简单的SELECT查询，从movies表中选择所有记录。
+- 使用了之前定义的加权评分算法。
+
+#### 按类型过滤
+
+```javascript
+filteredMovies = processedMovies.filter(movie => 
+  movie.types.some(type => type.toLowerCase().includes(typeQuery))
+);
+```
+
+- 使用 filter 函数根据typeQuery过滤电影。
+- 如果typeQuery包含在电影类型数组中，则保留该电影。
+
+### 搜索并排序
+
+`searchMovies.js`负责搜索页面的按文字查询并排序功能。
+
+具体逻辑完全一致，只是过滤条件不同。
+
+#### 按查询文字过滤
+
+```javascript
+const filteredMovies = processedMovies.filter(movie => {
+        const titleMatch = movie.title.toLowerCase().includes(query);
+        const actorsMatch = movie.actors.some(actor => removeDot(actor).toLowerCase().includes(query));
+        return titleMatch || actorsMatch;
+      });
+```
+
+- 如果标题或演员名单含有查询文字query，则保留该电影。
+
+### 查询具体电影
+
+`movie-details.js`负责查询具体电影的信息。
+
+#### 按id查询
+
+```javascript
+const movie = await db.get(
+      `SELECT * FROM movies WHERE id = ?`,
+      [id]
+    );
+```
+
+- 使用 await 关键字等待数据库异步查询完成。
+- 这里执行的是一个简单的SELECT查询，从movies表中选择id等于指定id的记录。
