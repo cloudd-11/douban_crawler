@@ -85,7 +85,9 @@ hw
 
 ### 远程仓库地址
 
-TODO
+Please refer to the following repos:
+
+https://github.com/cloudd-11/douban_crawler
 
 因为github仓库容量有限制，所以数据库文件`movies.db`, `movieonly.db`, 停用词表`stopwords.txt`, 封面图库`images/`, 词云图库`wordclouds/`都托管在huggingface。
 
