@@ -1,0 +1,26 @@
+.navbar {
+  width: 100%;
+  background-color: #36242A;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10; /* 确保导航栏在遮罩之上 */
+}
+
+.navitem {
+  color: #999;
+  text-decoration: none;
+  margin-left: 2rem;
+  cursor: pointer;
+  font-size: 1.4rem;
+  transition: all 0.3s ease;
+}
+
+.navitem:hover {
+  color: #ccc;
+  transform: scale(1.05);
+}

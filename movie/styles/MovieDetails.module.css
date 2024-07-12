@@ -1,0 +1,103 @@
+.container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  padding-top: 50px; /* 确保导航栏不遮挡内容 */
+  font-family: 'Montserrat', sans-serif;
+}
+
+.container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/hero-image.jpg') no-repeat center center / cover;
+  filter: blur(0px);
+  z-index: -2;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色遮罩 */
+  z-index: -1;
+}
+
+.movieDetails {
+  display: flex;
+  width: 90%; /* 给左右两边留出空隙 */
+  height: 90%; /* 给上下两边留出空隙 */
+  margin: auto; /* 水平居中对齐 */
+  background-color: rgba(0, 0, 0, 0.7); /* 半透明深色区块 */
+  padding: 20px;
+  border-radius: 10px;
+  gap: 0px; /* 去除内容卡片之间的间距 */
+}
+
+.leftPanel,
+.rightPanel {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+  color: white; /* 白色字体 */
+  font-size: 16px; /* 修改默认字体大小 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.leftPanel p {
+  margin-top: 0; /* 移除段落顶部的默认外边距 */
+  margin-bottom: 0; /* 移除段落底部的默认外边距 */
+  font-size: 16px;  /* 设置段落文字的字体大小 */
+  margin-bottom: 10px;  /* 调整段落之间的间距，确保每行之间有足够的空白 */
+  line-height: 1.6;  /* 设置行高，增加或减少行间距，可根据需要调整数值 */
+}
+
+.rightPanel p {
+  margin-top: 10px; /* 移除段落顶部的默认外边距 */
+  font-size: 20px;  /* 设置段落文字的字体大小 */
+}
+
+.movieHeader {
+  display: flex;
+  align-items: flex-start; /* 封面图与电影信息在同一水平线上 */
+  margin-bottom: 10px;
+}
+
+.cover img {
+  width: 300px; /* 增大封面图宽度 */
+  height: auto;
+  border-radius: 10px;
+  margin-right: 20px; /* 给封面和电影信息留出空隙 */
+}
+
+.wordCloud img {
+  width: 100%;
+  height: auto;
+}
+
+.comments {
+  margin-top: 10px;
+}
+
+
+
+.comment {
+  background-color: #2a2a2a;
+  padding: 5px;
+  margin-bottom: 0px;
+  border-radius: 5px;
+  color: white;
+  margin: 0px; /* 去除单个评论的外边距 */
+  padding: 10px 0px; /* 去除单个评论之间的间距 */
+}

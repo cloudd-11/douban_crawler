@@ -1,0 +1,5 @@
+*.pdf
+**/db/
+**/images/
+**/wordclouds/
+stopwords.txt
